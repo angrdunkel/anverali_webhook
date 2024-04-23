@@ -7,6 +7,7 @@ class DataBase():
         return psycopg2.connect(dbname='dbname', user='user', password='password', host='host')
     
     def get_gender(self, data):
+        #ищем в таблицах имя и определяем гендер
         conn = self.connect_db()
         cursor = conn.cursor()
         cursor.execute(f"SELECT COUNT (*) FROM male WHERE name='{data['name']}';")
@@ -34,9 +35,14 @@ class Utils():
 
 class Main(Utils, DataBase): 
     def __init__(self):
+        #адрес webhook
         url = 'https://example.com/webhook'
+        #получаем данные для сравнения
         get_data = self.get_request(url).json()
-        if get_data:
+        #получаем гендер
+        gender = self.get_gender(get_data)
+        #если ксть имя отправляем гендер и id
+        if gender:
             post_data = self.post_request(url, get_data)
         else:
             print(f'{get_data['name']} no matches')
